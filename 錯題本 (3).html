@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-<title>錯題本</title>
-<script src="https://accounts.google.com/gsi/client" async></script>
+<title>AI 錯題本</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --purple:#6C63FF;--purple-light:#EEF0FF;--purple-dark:#4B44CC;
@@ -176,6 +176,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .login-btn img{width:20px;height:20px;border-radius:50%;object-fit:cover;}
 .login-btn-dark{background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.25);color:white;}
 
+/* 新增：隱藏用 Google 官方登入按鈕容器 */
+#g_id_signin_hidden { display: none; }
+
 /* Toast */
 #toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:white;padding:11px 24px;border-radius:99px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:opacity 0.25s;white-space:nowrap;z-index:99999;}
 #toast.show{opacity:1;}
@@ -184,7 +187,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 <body>
 <div class="app">
 
-<!-- ══ 儀表板 ══ -->
 <div id="s-dashboard" class="screen active">
   <div class="dash-header">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
@@ -209,7 +211,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <button class="btn" onclick="goTo('s-pick-for-add')" style="margin-top:10px;">📝 新增錯題</button>
 </div>
 
-<!-- ══ 新增科目 ══ -->
+<div id="g_id_signin_hidden"></div>
+
 <div id="s-new-subject" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-dashboard')">←</div>
@@ -252,7 +255,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
-<!-- ══ 選科目（新增）══ -->
 <div id="s-pick-for-add" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-dashboard')">←</div>
@@ -262,7 +264,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <div class="subj-list" id="add-subj-list"></div>
 </div>
 
-<!-- ══ 輸入錯題 ══ -->
 <div id="s-add" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-pick-for-add')">←</div>
@@ -294,7 +295,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
-<!-- ══ 錯題列表 ══ -->
 <div id="s-list" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-dashboard')">←</div>
@@ -307,7 +307,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <button class="btn" onclick="openAdd(curSubject)" style="margin-top:1.25rem;">＋ 新增這科錯題</button>
 </div>
 
-<!-- ══ SHORTS 全螢幕 ══ -->
 <div id="s-shorts" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a1a;z-index:999;overflow:hidden;">
   <div class="shorts-topbar">
     <button class="shorts-back" onclick="closeShorts()">←</button>
@@ -342,7 +341,6 @@ function getMeta(name) {
   return s ? {icon:s.icon, bg:s.bg} : {icon:'📚', bg:'#eee'};
 }
 
-// 每張 slide 的「主色」，下一張的頂部 = 這張的底部，形成連續漸層
 var COLORLIST = [
   '#1a1a3e', '#2d1b69', '#0f2027', '#1a0533',
   '#0a2818', '#2a1500', '#00142a', '#1a0a1a',
@@ -392,7 +390,6 @@ function todayStr() {
 
 function vib(ms) { try { if(navigator.vibrate) navigator.vibrate(ms); } catch(e){} }
 
-// ── 新增科目 ──
 function resetNewSubjectForm() {
   document.getElementById('new-subj-name').value = '';
   document.getElementById('custom-emoji').value = '';
@@ -429,8 +426,6 @@ function createSubject() {
   goTo('s-dashboard');
 }
 
-// ── 儀表板 ──
-
 function renderDashboard() {
   var total = questions.length;
   var done  = questions.filter(function(q){ return q.done; }).length;
@@ -454,7 +449,6 @@ function renderDashboard() {
   });
 }
 
-// ── 選科目（新增）──
 function renderPickForAdd() {
   var el = document.getElementById('add-subj-list');
   el.innerHTML = '';
@@ -482,7 +476,6 @@ function openAdd(name) {
   goTo('s-add');
 }
 
-// ── 照片 ──
 function handlePhoto(input) {
   var file = input.files[0];
   if (!file) return;
@@ -506,7 +499,6 @@ function removePhoto() {
   document.getElementById('photo-remove-btn').style.display = 'none';
 }
 
-// ── 儲存 ──
 function saveQ() {
   var title = document.getElementById('add-title').value.trim();
   var desc  = document.getElementById('add-desc').value.trim();
@@ -517,7 +509,6 @@ function saveQ() {
   setTimeout(function(){ goTo('s-list'); }, 700);
 }
 
-// ── 錯題列表（卡片）──
 function renderList() {
   var list = questions.filter(function(q){ return q.subject===curSubject; });
   document.getElementById('list-title').textContent = curSubject+' 錯題';
@@ -577,7 +568,6 @@ function renderCards(list) {
   });
 }
 
-// ── SHORTS 模式 ──
 function renderShorts(show) {
   var scroll = document.getElementById('shorts-scroll');
   var dots   = document.getElementById('progress-dots');
@@ -675,26 +665,48 @@ function renderShorts(show) {
   },{passive:true});
 }
 
-// ── Google 登入 ──
+// ══ Google 登入系統優化 ══
 var CLIENT_ID = '454122098066-darscenpm003ajoq5vu5720ir2gocot8.apps.googleusercontent.com';
 var currentUser = null;
 
 function initGoogle() {
   if (window.google && google.accounts) {
-    google.accounts.id.initialize({ client_id: CLIENT_ID, callback: onLogin });
+    // 初始化 Identity Services
+    google.accounts.id.initialize({ 
+      client_id: CLIENT_ID, 
+      callback: onLogin 
+    });
+    
+    // 修正：在隱藏容器中渲染一個標準的 Google 登入按鈕，以便能透過 JS 點擊觸發
+    google.accounts.id.renderButton(
+      document.getElementById('g_id_signin_hidden'),
+      { theme: 'outline', size: 'large' }
+    );
   } else {
     setTimeout(initGoogle, 300);
   }
 }
 initGoogle();
 
+// 修正後的登入觸發邏輯
 function doLogin() {
-  if (!window.google || !google.accounts) { toast('Google 載入中，請稍後再試'); return; }
-  google.accounts.id.prompt(function(n) {
-    if (n.isNotDisplayed() || n.isSkippedMoment()) {
-      toast('⚠️ 請上傳到 GitHub Pages 後再登入');
+  if (!window.google || !google.accounts) { 
+    toast('Google 載入中，請稍後再試'); 
+    return; 
+  }
+  
+  try {
+    // 模擬點擊官方按鈕，這會安全地彈出標準登入視窗，避免在 localhost 或不符合條件時跳出 Prompt 阻擋錯誤
+    const hiddenButton = document.getElementById('g_id_signin_hidden').querySelector('[role="button"]');
+    if (hiddenButton) {
+      hiddenButton.click();
+    } else {
+      // 備用方案
+      google.accounts.id.prompt();
     }
-  });
+  } catch (e) {
+    google.accounts.id.prompt();
+  }
 }
 
 function onLogin(response) {
@@ -704,7 +716,8 @@ function onLogin(response) {
   }).join('')));
   currentUser = { name: data.name, email: data.email, avatar: data.picture };
 
-  var html = '<img src="'+data.picture+'"/> '+data.name.split(' ')[0];
+  // 渲染登入後的頭像與暱稱
+  var html = '<img src="'+data.picture+'" style="width:20px;height:20px;border-radius:50%;object-fit:cover;"/> '+data.name.split(' ')[0];
 
   var b1 = document.getElementById('subj-login-btn');
   if (b1) { b1.innerHTML = html; b1.onclick = null; }
@@ -716,7 +729,6 @@ function onLogin(response) {
   toast('✅ 已登入：'+data.name);
 }
 
-// ── 24小時重置 ──
 function checkReset() {
   var last = localStorage.getItem('lastReset');
   var now  = Date.now();
