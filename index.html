@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <title>AI 錯題本</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
 <style>
 :root{
   --purple:#6C63FF;--purple-light:#EEF0FF;--purple-dark:#4B44CC;
@@ -38,7 +38,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .sel-count{text-align:center;font-size:13px;color:var(--text-2);margin-bottom:1rem;}
 
 /* 儀表板 */
-.dash-header{background:linear-gradient(135deg,var(--purple),#A78BFA);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem;color:white;}
+.dash-header{background:linear-gradient(135deg,var(--purple),#A78BFA);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.25rem;color:white;position:relative;}
 .dash-header h2{font-size:20px;font-weight:700;margin-bottom:4px;}
 .dash-header p{font-size:13px;opacity:0.85;}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem;}
@@ -72,7 +72,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .q-action.done{color:var(--text-3);border-color:var(--border);}
 
 /* 輸入 */
-.subj-badge{display:inline-flex;align-items:center;gap:8px;background:var(--purple-light);color:var(--purple);border-radius:99px;padding:7px 18px;font-size:14px;font-weight:700;margin-bottom:12px;}
+.subj-badge{display:inline-flex;align-items:center;gap:8px;background:var(--purple-light);color:var(--purple);border-radius:99px;padding:7px 18px;font-size:14px;font-weight:700;margin-bottom:1.25rem;}
 .field{margin-bottom:1.1rem;}
 .field label{display:block;font-size:13px;color:var(--text-2);font-weight:600;margin-bottom:7px;}
 .field textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;color:var(--text);font-family:inherit;resize:vertical;min-height:90px;outline:none;background:var(--bg);}
@@ -182,17 +182,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 </style>
 </head>
 <body>
-
-<div id="g_id_onload"
-     data-client_id="454122098066-darscenpm003ajoq5vu5720ir2gocot8.apps.googleusercontent.com"
-     data-context="signin"
-     data-ux_mode="popup"
-     data-callback="onLogin"
-     data-auto_prompt="false">
-</div>
-
 <div class="app">
 
+<!-- ══ 儀表板 ══ -->
 <div id="s-dashboard" class="screen active">
   <div class="dash-header">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
@@ -204,6 +196,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
         <svg width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         登入
       </button>
+      <div id="logout-menu" style="display:none;position:absolute;top:60px;right:16px;background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);padding:6px;z-index:50;min-width:140px;">
+        <div style="padding:10px 14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border);margin-bottom:4px;" id="logout-menu-email"></div>
+        <div onclick="doLogout()" style="padding:10px 14px;font-size:14px;color:#EF4444;font-weight:600;cursor:pointer;border-radius:8px;touch-action:manipulation;">登出</div>
+      </div>
     </div>
   </div>
   <div class="stats">
@@ -217,6 +213,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <button class="btn" onclick="goTo('s-pick-for-add')" style="margin-top:10px;">📝 新增錯題</button>
 </div>
 
+<!-- ══ 新增科目 ══ -->
 <div id="s-new-subject" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-dashboard')">←</div>
@@ -259,6 +256,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
+<!-- ══ 選科目（新增）══ -->
 <div id="s-pick-for-add" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-dashboard')">←</div>
@@ -268,6 +266,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <div class="subj-list" id="add-subj-list"></div>
 </div>
 
+<!-- ══ 輸入錯題 ══ -->
 <div id="s-add" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-pick-for-add')">←</div>
@@ -299,6 +298,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   </div>
 </div>
 
+<!-- ══ 錯題列表 ══ -->
 <div id="s-list" class="screen">
   <div class="topbar">
     <div class="back" onclick="goTo('s-dashboard')">←</div>
@@ -311,6 +311,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
   <button class="btn" onclick="openAdd(curSubject)" style="margin-top:1.25rem;">＋ 新增這科錯題</button>
 </div>
 
+<!-- ══ SHORTS 全螢幕 ══ -->
 <div id="s-shorts" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#0a0a1a;z-index:999;overflow:hidden;">
   <div class="shorts-topbar">
     <button class="shorts-back" onclick="closeShorts()">←</button>
@@ -345,6 +346,7 @@ function getMeta(name) {
   return s ? {icon:s.icon, bg:s.bg} : {icon:'📚', bg:'#eee'};
 }
 
+// 每張 slide 的「主色」，下一張的頂部 = 這張的底部，形成連續漸層
 var COLORLIST = [
   '#1a1a3e', '#2d1b69', '#0f2027', '#1a0533',
   '#0a2818', '#2a1500', '#00142a', '#1a0a1a',
@@ -432,6 +434,7 @@ function createSubject() {
 }
 
 // ── 儀表板 ──
+
 function renderDashboard() {
   var total = questions.length;
   var done  = questions.filter(function(q){ return q.done; }).length;
@@ -683,11 +686,22 @@ var currentUser = null;
 function initGoogle() {
   if (window.google && google.accounts) {
     google.accounts.id.initialize({ client_id: CLIENT_ID, callback: onLogin });
+    restoreLogin();
   } else {
     setTimeout(initGoogle, 300);
   }
 }
 initGoogle();
+
+function restoreLogin() {
+  try {
+    var saved = localStorage.getItem('currentUser');
+    if (saved) {
+      currentUser = JSON.parse(saved);
+      applyLoggedInUI(currentUser);
+    }
+  } catch(e) {}
+}
 
 function doLogin() {
   if (!window.google || !google.accounts) { toast('Google 載入中，請稍後再試'); return; }
@@ -704,18 +718,47 @@ function onLogin(response) {
     return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);
   }).join('')));
   currentUser = { name: data.name, email: data.email, avatar: data.picture };
-
-  var html = '<img src="'+data.picture+'"/> '+data.name.split(' ')[0];
-
-  var b1 = document.getElementById('subj-login-btn');
-  if (b1) { b1.innerHTML = html; b1.onclick = null; }
-
-  var b2 = document.getElementById('dash-login-btn');
-  if (b2) { b2.innerHTML = html; b2.onclick = null; }
-
-  document.getElementById('dash-title').textContent = '嗨，'+data.name.split(' ')[0]+' 👋';
+  localStorage.setItem('currentUser', JSON.stringify(currentUser));
+  applyLoggedInUI(currentUser);
   toast('✅ 已登入：'+data.name);
 }
+
+function applyLoggedInUI(user) {
+  var html = '<img src="'+user.avatar+'"/> '+user.name.split(' ')[0];
+  var btn = document.getElementById('dash-login-btn');
+  if (btn) {
+    btn.innerHTML = html;
+    btn.onclick = toggleLogoutMenu;
+  }
+  document.getElementById('dash-title').textContent = '嗨，'+user.name.split(' ')[0]+' 👋';
+  document.getElementById('logout-menu-email').textContent = user.email;
+}
+
+function toggleLogoutMenu() {
+  var menu = document.getElementById('logout-menu');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('currentUser');
+  document.getElementById('logout-menu').style.display = 'none';
+  var btn = document.getElementById('dash-login-btn');
+  btn.innerHTML =
+    '<svg width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> 登入';
+  btn.onclick = doLogin;
+  document.getElementById('dash-title').textContent = '我的錯題本 📓';
+  toast('👋 已登出');
+}
+
+// 點選單外面時自動關閉
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('logout-menu');
+  var btn  = document.getElementById('dash-login-btn');
+  if (menu && menu.style.display === 'block' && !menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
 
 // ── 24小時重置 ──
 function checkReset() {
