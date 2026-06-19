@@ -685,7 +685,7 @@ var currentUser = null;
 
 function initGoogle() {
   if (window.google && google.accounts) {
-    google.accounts.id.initialize({ client_id: CLIENT_ID, callback: onLogin });
+    google.accounts.id.initialize({ client_id: CLIENT_ID, callback: onLogin, ux_mode: 'popup' });
     restoreLogin();
   } else {
     setTimeout(initGoogle, 300);
@@ -705,11 +705,27 @@ function restoreLogin() {
 
 function doLogin() {
   if (!window.google || !google.accounts) { toast('Google 載入中，請稍後再試'); return; }
-  google.accounts.id.prompt(function(n) {
-    if (n.isNotDisplayed() || n.isSkippedMoment()) {
-      toast('⚠️ 請上傳到 GitHub Pages 後再登入');
+
+  // 建立隱藏容器來渲染 Google 官方按鈕，再用程式自動點擊它
+  // 這比 prompt() 穩定很多，不會被瀏覽器擋掉
+  var hiddenDiv = document.getElementById('gsi-hidden-btn');
+  if (!hiddenDiv) {
+    hiddenDiv = document.createElement('div');
+    hiddenDiv.id = 'gsi-hidden-btn';
+    hiddenDiv.style.cssText = 'position:fixed;top:-1000px;left:-1000px;';
+    document.body.appendChild(hiddenDiv);
+  }
+  hiddenDiv.innerHTML = '';
+  google.accounts.id.renderButton(hiddenDiv, { type:'standard', theme:'outline', size:'large' });
+
+  setTimeout(function() {
+    var realBtn = hiddenDiv.querySelector('div[role="button"]');
+    if (realBtn) {
+      realBtn.click();
+    } else {
+      toast('⚠️ Google 登入按鈕載入失敗，請重新整理頁面再試');
     }
-  });
+  }, 300);
 }
 
 function onLogin(response) {
